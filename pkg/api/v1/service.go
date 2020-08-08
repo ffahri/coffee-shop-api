@@ -37,6 +37,9 @@ func (u *Util) Order(ctx context.Context, body io.ReadCloser) (int, gin.H) {
 		log.Error().Err(err).Msg("json unmarshall error in order function")
 		return 422, gin.H{"Message": "UnprocessableEntity"}
 	}
+	if !validateOrder(order) {
+		return 422, gin.H{"Message": "UnprocessableEntity"}
+	}
 	stmt, err := u.DB.PreparexContext(ctx, "SELECT Stock from Drinks where Id = ?")
 	if err != nil {
 		span.RecordError(spanContext, err)
@@ -89,4 +92,11 @@ func (u *Util) Order(ctx context.Context, body io.ReadCloser) (int, gin.H) {
 	}
 	log.Err(err).Msg("order could not be placed")
 	return 422, gin.H{"Message": "Order could not be placed !"}
+}
+
+func validateOrder(request OrderRequest) bool {
+	if request.Quantity < 0 || request.Id == "" {
+		return false
+	}
+	return true
 }
