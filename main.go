@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	gintrace "go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin"
 	otelglobal "go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/exporters/stdout"
+	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"log"
 )
 
 func initTracer() {
-	exporter, err := stdout.NewExporter(stdout.WithPrettyPrint())
+	exporter, err := jaeger.NewRawExporter(jaeger.WithCollectorEndpoint("http://localhost:14268/api/traces")) //stdout.NewExporter(stdout.WithPrettyPrint())
 	if err != nil {
 		log.Fatal(err)
 	}
